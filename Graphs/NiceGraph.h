@@ -90,6 +90,7 @@ Worst Case: O(n^2) where n is the number of nodes in NiceGraph ng
 int findLeaf(struct NiceGraph* ng)
 
 /*
+https://www.cs.hmc.edu/~keller/courses/cs60/s98/examples/acyclic/
 */
 bool isCyclic(struct NiceGraph* ng)
 
