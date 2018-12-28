@@ -77,15 +77,20 @@ struct Pair* initPair(int firstOne, int secondOne){
 }
 
 struct Pair** initPairs(int* firstArray, int* secondArray, int size){
-    if(size < 1){
+    if(size < 1)
         exit(BAD_ARGS_DS);
-    }
 
-    struct Pair* (pairArray[size]);
+    struct Pair * pairArray;
+    pairArray = malloc(size * sizeof(struct Pair));
+    
+    // example on ng for 2d array
+    // bool** AdjacMatrix;
+    // (*ng).AdjacMatrix = malloc(numOfNodes * sizeof(bool *));
 
     for(int i = 0; i < size; i++){
-        pairArray[i] = initPair(firstArray[i], secondArray[i]);
-    }
+        (pairArray[i]).one = firstArray[i];
+        (pairArray[i]).two = secondArray[i];
+    };
 
     return pairArray;
 }
