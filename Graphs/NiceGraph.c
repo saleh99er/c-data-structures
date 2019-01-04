@@ -3,12 +3,12 @@
 #define DATA_SIZE_FAULT 3
 #define MALLOC_FAULT 4
 #define BAD_ARGS_DS 5
-#define DS_FAILED 6 //data struct invar failed, prob failed its check
+#define DS_FAILED 6
 
 typedef int bool;
 enum{false, true};
 
-struct NiceGraph{
+typedef struct {
     bool isSym;
     bool isRef;
     bool isTrans;
@@ -16,26 +16,31 @@ struct NiceGraph{
     int numNodes;
     bool** AdjacMatrix;
     void* nodes;
-};
+}NiceGraph;
 
-struct Pair{
+typedef struct {
     int one;
     int two;
-};
+}Pair;
 
-struct NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool isTransitive){
-    
+typedef struct {
+    int size;
+    Pair* pl;
+}PairList;
+
+NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool isTransitive){
+
     if(numOfNodes < 1){
         exit(BAD_ARGS_DS);
     }
 
-    struct NiceGraph *ng = (struct NiceGraph*)malloc(sizeof(struct NiceGraph));
-    
+    NiceGraph *ng = (NiceGraph*)malloc(sizeof(NiceGraph));
+
     if(ng == NULL){
         printf("No space for empty Nice Graph");
         exit(DATA_SIZE_FAULT);
     };
-    
+
     (*ng).numNodes = numOfNodes;
     (*ng).isSym = isSymmetric;
     (*ng).isRef = isReflexive;
@@ -45,7 +50,7 @@ struct NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexiv
     for(int i = 0;i < numOfNodes; ++i)
         (*ng).AdjacMatrix[i] = malloc(numOfNodes * sizeof(bool));
         //maybe not allocate based on number of nodes here ^^
-    
+
     //debug statement
     printf("Initialized Nice Graph with %d nodes and the following prop: \n",numOfNodes);
     if(isSymmetric) //to lazy to do proper string formatting for this
@@ -65,30 +70,30 @@ struct NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexiv
     return ng;
 }
 
-struct Pair* initPair(int firstOne, int secondOne){
 
     if(firstOne < 0 || secondOne < 0)
+    Pair* initPair(int firstOne, int secondOne){
         exit(BAD_ARGS_DS);
 
-    struct Pair *p = (struct Pair*)malloc(sizeof(struct Pair));
+    Pair *p = (Pair*)malloc(sizeof(Pair));
     (*p).one = firstOne;
     (*p).two = secondOne;
 
     return p;
 }
 
-struct Pair** initPairs(int* firstArray, int* secondArray, int size){
+Pair** initPairs(int* firstArray, int* secondArray, int size){
     if(size < 1)
         exit(BAD_ARGS_DS);
 
-    struct Pair ** pl = (struct Pair**)malloc(size * sizeof(struct Pair));
+    Pair ** pl = (Pair**)malloc(size * sizeof(Pair));
     for(int i=0;i<size;i++){
         pl[i] = initPair(firstArray[i],secondArray[i]);
     }
 }
 
-struct NiceGraph * initNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool isTransitive, struct Pair** adjacList, int aListLength){
-    struct NiceGraph* ng = initEmptyNG(numOfNodes, isSymmetric, isReflexive, isTransitive);
+NiceGraph * initNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool isTransitive,  Pair** adjacList, int aListLength){
+    NiceGraph* ng = initEmptyNG(numOfNodes, isSymmetric, isReflexive, isTransitive);
     for(int i=0;i<aListLength; i++){
         addEdge(ng, (adjacList[i])->one, (adjacList[i])->two);
     }
@@ -96,13 +101,13 @@ struct NiceGraph * initNG(int numOfNodes, bool isSymmetric, bool isReflexive, bo
     //printf("WIP");
 }
 
-void addEdge(struct NiceGraph* ng, struct Pair* p){
+void addEdge(NiceGraph* ng, Pair* p){
     ng->AdjacMatrix[(p->one)][(p->two)] = true;
 
     //symmetric logic
     if(ng->isSym)
         ng->AdjacMatrix[(p->two)][(p->one)] = true;
-    
+
     //transitive logic
     if(ng->isTrans){
         for(int i = 0; i < ng->numNodes; i++){
@@ -112,13 +117,13 @@ void addEdge(struct NiceGraph* ng, struct Pair* p){
     }
 }
 
-void addEdgeNC(struct NiceGraph* ng, int one, int two){
+void addEdgeNC(NiceGraph* ng, int one, int two){
     ng->AdjacMatrix[one][two] = true;
 
     //symmetric logic
     if(ng->isSym)
         ng->AdjacMatrix[two][one] = true;
-    
+
     //transitive logic
     if(ng->isTrans){
         for(int i = 0; i < ng->numNodes; i++){
@@ -128,7 +133,7 @@ void addEdgeNC(struct NiceGraph* ng, int one, int two){
     }
 }
 
-void removeEdge(struct NiceGraph* ng, struct Pair* p){
+void removeEdge( NiceGraph* ng,  Pair* p){
     ng->AdjacMatrix[(p->one)][(p->two)] = false;
     printf("WIP");
 
@@ -145,7 +150,7 @@ void removeEdge(struct NiceGraph* ng, struct Pair* p){
     }
 }
 
-void removeEdgeNC(struct NiceGraph* ng, int one, int two){
+void removeEdgeNC( NiceGraph* ng, int one, int two){
     ng->AdjacMatrix[one][two] = false;
     printf("WIP");
 
@@ -162,9 +167,9 @@ void removeEdgeNC(struct NiceGraph* ng, int one, int two){
     }
 }
 
-struct NiceGraph* removeNode(struct NiceGraph* ng, int node){
+ NiceGraph* removeNode( NiceGraph* ng, int node){
     int newNumNodes = ng->numNodes - 1;
-    struct NiceGraph* newNG = initEmptyNG(newNumNodes, ng->isSym, ng->isRef, ng->isTrans);
+     NiceGraph* newNG = initEmptyNG(newNumNodes, ng->isSym, ng->isRef, ng->isTrans);
     int k;
 
     for(int i = 0; i < newNumNodes; i++){
@@ -181,12 +186,12 @@ struct NiceGraph* removeNode(struct NiceGraph* ng, int node){
     return newNG;
 }
 
-bool isDirectConnect(struct NiceGraph* ng, int one, int two){
+bool isDirectConnect( NiceGraph* ng, int one, int two){
     return ng->AdjacMatrix[one][two];
 }
 
 //very unsure if this will work
-bool isConnected(struct NiceGraph* ng, int one, int two, bool* travSet){
+bool isConnected( NiceGraph* ng, int one, int two, bool* travSet){
     for(int neigh=0; neigh < ng->numNodes; neigh++){
         if(ng->AdjacMatrix[one][neigh] && !travSet[neigh]){
             travSet[neigh] = true;
@@ -194,13 +199,13 @@ bool isConnected(struct NiceGraph* ng, int one, int two, bool* travSet){
                 return true;
             bool isNeighConnected = isConnected(ng, neigh,two, travSet);
             if(isNeighConnected)
-                return true;            
+                return true;
         }
     }
     return false;
 }
 
-int findLeaf(struct NiceGraph* ng){
+int findLeaf( NiceGraph* ng){
     int outEdges;
     for(int row = 0; row < ng->numNodes; row++){
         outEdges = 0;
@@ -213,7 +218,7 @@ int findLeaf(struct NiceGraph* ng){
     return -1;
 }
 
-bool isCyclic(struct NiceGraph* ng){
+bool isCyclic( NiceGraph* ng){
     while(ng->numNodes > 0){
         int leaf = findLeaf(ng);
         if(leaf == -1) return true; //implicitly we know there are more than 0 nodes
@@ -222,7 +227,7 @@ bool isCyclic(struct NiceGraph* ng){
     return false;
 }
 
-void debugAdjMatrix(struct NiceGraph* ng){
+void debugAdjMatrix( NiceGraph* ng){
     if(ng->numNodes > 10)
         printf("Warning that attempting to debug the adj matrix by printing is not recommended");
     printf("     ");
@@ -232,20 +237,20 @@ void debugAdjMatrix(struct NiceGraph* ng){
     printf("\n");
     for(int i = 0; i < (ng->numNodes); i++){
         printf(" [%0d] ",i);
-        for(int j = 0; j < (ng->numNodes); j++){ 
+        for(int j = 0; j < (ng->numNodes); j++){
             printf((ng->AdjacMatrix[i][j] ? " x ":" _ "));
         }
         printf("\n");
     }
 }
 
-void debugPL(struct Pair** pl, int size){
+void debugPL( Pair** pl, int size){
     printf("Printing PairList");
     for(int i = 0; i < size; i++)
         printf("[%d] -> [%d] \n", (pl[i])->one, (pl[i])->two);
 }
 
-void freeNG(struct NiceGraph* ng){
+void freeNG( NiceGraph* ng){
     for(int i = 0; i < ng->numNodes; i++){
         free(ng->AdjacMatrix[i]);
     }
@@ -253,7 +258,7 @@ void freeNG(struct NiceGraph* ng){
     free(ng);
 }
 
-void freePL(struct Pair** pl, int size){
+void freePL( Pair** pl, int size){
     for(int i = 0;i<size; i++){
         free(pl[i]);
     }
@@ -267,7 +272,7 @@ int main(){
     int ingoing[6] = {1,1,2,2,3,3};
     int outgoing[6] = {2,3,1,3,1,2};
     printf("Arrays initialized \n");
-    struct Pair ** pl1 = initPairs(ingoing,outgoing,6);
+     Pair ** pl1 = initPairs(ingoing,outgoing,6);
     printf("Pair List initialized \n");
     printf("first pair %d %d \n",pl1[0]->one, pl1[1]->two);
     printf("jerry rigged sample of first pair in list \n");
@@ -275,6 +280,6 @@ int main(){
     //7. Use initNG with above pair list
     printf("debugged pair list \n");
     freePL(pl1,6);
-    
+
     return 0;
 }
