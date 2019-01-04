@@ -44,6 +44,7 @@ struct NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexiv
     (*ng).AdjacMatrix = malloc(numOfNodes * sizeof(bool *));
     for(int i = 0;i < numOfNodes; ++i)
         (*ng).AdjacMatrix[i] = malloc(numOfNodes * sizeof(bool));
+        //maybe not allocate based on number of nodes here ^^
     
     //debug statement
     printf("Initialized Nice Graph with %d nodes and the following prop: \n",numOfNodes);
@@ -80,19 +81,19 @@ struct Pair** initPairs(int* firstArray, int* secondArray, int size){
     if(size < 1)
         exit(BAD_ARGS_DS);
 
-    struct Pair * pairArray;
-    pairArray = malloc(size * sizeof(struct Pair));
+    struct Pair * pairArray[size];
     
     // example on ng for 2d array
     // bool** AdjacMatrix;
     // (*ng).AdjacMatrix = malloc(numOfNodes * sizeof(bool *));
 
     for(int i = 0; i < size; i++){
-        (pairArray[i]).one = firstArray[i];
-        (pairArray[i]).two = secondArray[i];
+        pairArray[i] = malloc(sizeof(struct Pair));
+        pairArray[i]->one = firstArray[i];
+        pairArray[i]->two = secondArray[i];
     };
 
-    return pairArray;
+    return &pairArray;
 }
 
 struct NiceGraph * initNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool isTransitive, struct Pair** adjacList, int aListLength){
@@ -272,46 +273,48 @@ void freePL(struct Pair** pl, int size){
 int main(){
 
     //1. empty Nice Graph init
-    struct NiceGraph * ng1 = initEmptyNG(7, true, true, true);
-    if(!(*ng1).isSym || !(*ng1).isRef || !(*ng1).isTrans)
-        //printf("DS failure");
-        exit(DS_FAILED);
-    printf("%d\n",(*ng1).AdjacMatrix[0][0]);
-
-    //2 debug print the adjacency matrix
-    debugAdjMatrix(ng1);
-
-    //3. pair init
-    struct Pair * p1 = initPair(1,3);
-    
-    //4. Adding p1 pair to ng1
-    addEdge(ng1, p1);
-    debugAdjMatrix(ng1);
-
-    //5. Creating a no sym, reflex, trans, graph with 
-    //empty Nice Graph init and same pair added
-    struct NiceGraph * ng2 = initEmptyNG(5, false, true, true);
-    printf("%d %d %d \n", ng2->isSym, ng2->isRef, ng2->isTrans);
-
-    // if((*ng2).isSym || !(*ng2).isRef || !(*ng2).isTrans)
-    //     printf("DS failure \n");
+    // struct NiceGraph * ng1 = initEmptyNG(7, true, true, true);
+    // if(!(*ng1).isSym || !(*ng1).isRef || !(*ng1).isTrans)
+    //     //printf("DS failure");
     //     exit(DS_FAILED);
-    addEdge(ng2, p1);
-    debugAdjMatrix(ng2);
+    // printf("%d\n",(*ng1).AdjacMatrix[0][0]);
+
+    // //2 debug print the adjacency matrix
+    // debugAdjMatrix(ng1);
+
+    // //3. pair init
+    // struct Pair * p1 = initPair(1,3);
+    
+    // //4. Adding p1 pair to ng1
+    // addEdge(ng1, p1);
+    // debugAdjMatrix(ng1);
+
+    // //5. Creating a no sym, reflex, trans, graph with 
+    // //empty Nice Graph init and same pair added
+    // struct NiceGraph * ng2 = initEmptyNG(5, false, true, true);
+    // printf("%d %d %d \n", ng2->isSym, ng2->isRef, ng2->isTrans);
+
+    // // if((*ng2).isSym || !(*ng2).isRef || !(*ng2).isTrans)
+    // //     printf("DS failure \n");
+    // //     exit(DS_FAILED);
+    // addEdge(ng2, p1);
+    // debugAdjMatrix(ng2);
     
     //6. Creating a pair list
-    int ingoing = {1,1,2,2,3,3};
-    int outgoing = {2,3,1,3,1,2};
-    struct Pair * pl1 = initPairs(ingoing,outgoing,6);
+    int ingoing[6] = {1,1,2,2,3,3};
+    int outgoing[6] = {2,3,1,3,1,2};
+    printf("Arrays initialized \n");
+    struct Pair ** pl1 = initPairs(ingoing,outgoing,6);
+    printf("Pair List initialized \n");
     debugPL(pl1, 6);
     //7. Use initNG with above pair list
 
 
 
     //passed all checks, successful
-    freeNG(ng1);
-    free(p1);
-    free(ng2);
+    // freeNG(ng1);
+    // free(p1);
+    // free(ng2);
     freePL(pl1,6);
     
     return 0;
