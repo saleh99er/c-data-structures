@@ -25,7 +25,7 @@ typedef struct {
 
 typedef struct {
     int size;
-    Pair* pl;
+    Pair* list;
 }PairList;
 
 NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool isTransitive){
@@ -49,7 +49,6 @@ NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool
     (*ng).AdjacMatrix = malloc(numOfNodes * sizeof(bool *));
     for(int i = 0;i < numOfNodes; ++i)
         (*ng).AdjacMatrix[i] = malloc(numOfNodes * sizeof(bool));
-        //maybe not allocate based on number of nodes here ^^
 
     //debug statement
     printf("Initialized Nice Graph with %d nodes and the following prop: \n",numOfNodes);
@@ -70,35 +69,25 @@ NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool
     return ng;
 }
 
-
-    if(firstOne < 0 || secondOne < 0)
-    Pair* initPair(int firstOne, int secondOne){
-        exit(BAD_ARGS_DS);
-
-    Pair *p = (Pair*)malloc(sizeof(Pair));
-    (*p).one = firstOne;
-    (*p).two = secondOne;
-
-    return p;
-}
-
-Pair** initPairs(int* firstArray, int* secondArray, int size){
+PairList * initPairs(int* firstArray, int* secondArray, int size){
     if(size < 1)
         exit(BAD_ARGS_DS);
 
-    Pair ** pl = (Pair**)malloc(size * sizeof(Pair));
-    for(int i=0;i<size;i++){
-        pl[i] = initPair(firstArray[i],secondArray[i]);
+    PairList * pl = (PairList*)malloc(sizeof(PairList));
+    pl->list = malloc(size * sizeof(Pair *));
+    for(int i=0;i<pl->size;i++){
+        (*pl).list[i] = initPair(firstArray[i],secondArray[i]);
     }
+
+    return pl;
 }
 
-NiceGraph * initNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool isTransitive,  Pair** adjacList, int aListLength){
+NiceGraph * initNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool isTransitive,  PairList* pl){
     NiceGraph* ng = initEmptyNG(numOfNodes, isSymmetric, isReflexive, isTransitive);
-    for(int i=0;i<aListLength; i++){
-        addEdge(ng, (adjacList[i])->one, (adjacList[i])->two);
+    for(int i=0;i<pl->size; i++){
+        addEdge(ng, pl->list[i]->one,pl->list[i]->two);
     }
     return ng;
-    //printf("WIP");
 }
 
 void addEdge(NiceGraph* ng, Pair* p){
@@ -167,7 +156,7 @@ void removeEdgeNC( NiceGraph* ng, int one, int two){
     }
 }
 
- NiceGraph* removeNode( NiceGraph* ng, int node){
+NiceGraph* removeNode( NiceGraph* ng, int node){
     int newNumNodes = ng->numNodes - 1;
      NiceGraph* newNG = initEmptyNG(newNumNodes, ng->isSym, ng->isRef, ng->isTrans);
     int k;
@@ -244,13 +233,13 @@ void debugAdjMatrix( NiceGraph* ng){
     }
 }
 
-void debugPL( Pair** pl, int size){
+void debugPL(PairList* pl){
     printf("Printing PairList");
-    for(int i = 0; i < size; i++)
-        printf("[%d] -> [%d] \n", (pl[i])->one, (pl[i])->two);
+    for(int i = 0; i < pl->size; i++)
+        printf("[%d] -> [%d] \n", pl->list[i]->one, pl->list[i]->two);
 }
 
-void freeNG( NiceGraph* ng){
+void freeNG(NiceGraph* ng){
     for(int i = 0; i < ng->numNodes; i++){
         free(ng->AdjacMatrix[i]);
     }
@@ -272,14 +261,14 @@ int main(){
     int ingoing[6] = {1,1,2,2,3,3};
     int outgoing[6] = {2,3,1,3,1,2};
     printf("Arrays initialized \n");
-     Pair ** pl1 = initPairs(ingoing,outgoing,6);
+     PairList* pl1 = initPairs(ingoing,outgoing,6);
     printf("Pair List initialized \n");
-    printf("first pair %d %d \n",pl1[0]->one, pl1[1]->two);
+    printf("first pair %d %d \n",pl->list[0]->one, pl->list[0]->two);
     printf("jerry rigged sample of first pair in list \n");
     debugPL(pl1, 6);
     //7. Use initNG with above pair list
     printf("debugged pair list \n");
     freePL(pl1,6);
-
+    printf("freed pair list \n");
     return 0;
 }
