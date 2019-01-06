@@ -18,24 +18,19 @@ struct NiceGraph{
     void* nodes;
 };
 
-struct Pair{
-    int one;
-    int two;
-};
-
 struct NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool isTransitive){
-    
+
     if(numOfNodes < 1){
         exit(BAD_ARGS_DS);
     }
 
     struct NiceGraph *ng = (struct NiceGraph*)malloc(sizeof(struct NiceGraph));
-    
+
     if(ng == NULL){
         printf("No space for empty Nice Graph");
         exit(DATA_SIZE_FAULT);
     };
-    
+
     (*ng).numNodes = numOfNodes;
     (*ng).isSym = isSymmetric;
     (*ng).isRef = isReflexive;
@@ -44,7 +39,7 @@ struct NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexiv
     (*ng).AdjacMatrix = malloc(numOfNodes * sizeof(bool *));
     for(int i = 0;i < numOfNodes; ++i)
         (*ng).AdjacMatrix[i] = malloc(numOfNodes * sizeof(bool));
-    
+
     //debug statement
     printf("Initialized Nice Graph with %d nodes and the following prop: \n",numOfNodes);
     if(isSymmetric) //to lazy to do proper string formatting for this
@@ -53,6 +48,8 @@ struct NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexiv
         printf("Reflexive,");
     if(isTransitive)
         printf("Transitive");
+    else if(!isSymmetric && !isReflexive && !isTransitive)
+        printf("N/a");
     printf("\n");
 
     if(isReflexive){
@@ -64,69 +61,21 @@ struct NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexiv
     return ng;
 }
 
-struct Pair* initPair(int firstOne, int secondOne){
-
-    if(firstOne < 0 || secondOne < 0)
-        exit(BAD_ARGS_DS);
-
-    struct Pair *p = (struct Pair*)malloc(sizeof(struct Pair));
-    (*p).one = firstOne;
-    (*p).two = secondOne;
-
-    return p;
-}
-
-struct Pair** initPairs(int* firstArray, int* secondArray, int size){
-    if(size < 1)
-        exit(BAD_ARGS_DS);
-
-    struct Pair * pairArray;
-    pairArray = malloc(size * sizeof(struct Pair));
-    
-    // example on ng for 2d array
-    // bool** AdjacMatrix;
-    // (*ng).AdjacMatrix = malloc(numOfNodes * sizeof(bool *));
-
-    for(int i = 0; i < size; i++){
-        (pairArray[i]).one = firstArray[i];
-        (pairArray[i]).two = secondArray[i];
-    };
-
-    return pairArray;
-}
-
-struct NiceGraph * initNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool isTransitive, struct Pair** adjacList, int aListLength){
+struct NiceGraph * initNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool isTransitive, int* in, int* out, int eListSize){
     struct NiceGraph* ng = initEmptyNG(numOfNodes, isSymmetric, isReflexive, isTransitive);
-    for(int i=0;i<aListLength; i++){
-        addEdge(ng, (adjacList[i])->one, (adjacList[i])->two);
-    }
+    for(int i=0;i<eListSize; i++)
+        addEdge(ng, in[i] , out[i] );
     return ng;
     //printf("WIP");
 }
 
-void addEdge(struct NiceGraph* ng, struct Pair* p){
-    ng->AdjacMatrix[(p->one)][(p->two)] = true;
-
-    //symmetric logic
-    if(ng->isSym)
-        ng->AdjacMatrix[(p->two)][(p->one)] = true;
-    
-    //transitive logic
-    if(ng->isTrans){
-        for(int i = 0; i < ng->numNodes; i++){
-            if(ng->AdjacMatrix[p->two][i])
-                ng->AdjacMatrix[p->one][i] = true;
-        }
-    }
-}
-
-void addEdgeNC(struct NiceGraph* ng, int one, int two){
+void addEdge(struct NiceGraph* ng, int one, int two){
     ng->AdjacMatrix[one][two] = true;
 
     //symmetric logic
     if(ng->isSym)
         ng->AdjacMatrix[two][one] = true;
-    
+
     //transitive logic
     if(ng->isTrans){
         for(int i = 0; i < ng->numNodes; i++){
@@ -136,24 +85,7 @@ void addEdgeNC(struct NiceGraph* ng, int one, int two){
     }
 }
 
-void removeEdge(struct NiceGraph* ng, struct Pair* p){
-    ng->AdjacMatrix[(p->one)][(p->two)] = false;
-    printf("WIP");
-
-    //symmetric logic
-    if(ng->isSym)
-        ng->AdjacMatrix[(p->two)][(p->one)] = false;
-
-    //transitive logic
-    if(ng->isTrans){
-        for(int i = 0; i < ng->numNodes; i++){
-            if(ng->AdjacMatrix[p->two][i])
-                ng->AdjacMatrix[p->one][i] = true;
-        }
-    }
-}
-
-void removeEdgeNC(struct NiceGraph* ng, int one, int two){
+void removeEdge(struct NiceGraph* ng, int one, int two){
     ng->AdjacMatrix[one][two] = false;
     printf("WIP");
 
@@ -202,7 +134,7 @@ bool isConnected(struct NiceGraph* ng, int one, int two, bool* travSet){
                 return true;
             bool isNeighConnected = isConnected(ng, neigh,two, travSet);
             if(isNeighConnected)
-                return true;            
+                return true;
         }
     }
     return false;
@@ -240,17 +172,11 @@ void debugAdjMatrix(struct NiceGraph* ng){
     printf("\n");
     for(int i = 0; i < (ng->numNodes); i++){
         printf(" [%0d] ",i);
-        for(int j = 0; j < (ng->numNodes); j++){ 
+        for(int j = 0; j < (ng->numNodes); j++){
             printf((ng->AdjacMatrix[i][j] ? " x ":" _ "));
         }
         printf("\n");
     }
-}
-
-void debugPL(struct Pair** pl, int size){
-    printf("Printing PairList");
-    for(int i = 0; i < size; i++)
-        printf("[%d] -> [%d] \n", (pl[i])->one, (pl[i])->two);
 }
 
 void freeNG(struct NiceGraph* ng){
@@ -261,11 +187,9 @@ void freeNG(struct NiceGraph* ng){
     free(ng);
 }
 
-void freePL(struct Pair** pl, int size){
-    for(int i = 0;i<size; i++){
-        free(pl[i]);
-    }
-    free(pl);
+void printEdges(int* in, int* out, int size){
+    for(int i = 0; i < size; i++)
+        printf("%d -> %d \n", in[i], out[i]);
 }
 
 //comment out when using the lib
@@ -281,38 +205,39 @@ int main(){
     //2 debug print the adjacency matrix
     debugAdjMatrix(ng1);
 
-    //3. pair init
-    struct Pair * p1 = initPair(1,3);
-    
-    //4. Adding p1 pair to ng1
-    addEdge(ng1, p1);
+    //3. adding 1->3 edge on ng1
+    addEdge(ng1, 1,3);
     debugAdjMatrix(ng1);
 
-    //5. Creating a no sym, reflex, trans, graph with 
-    //empty Nice Graph init and same pair added
-    struct NiceGraph * ng2 = initEmptyNG(5, false, true, true);
+    //4. Creating a no sym, reflex, trans, graph with
+    //empty Nice Graph init and same edge added
+    struct NiceGraph* ng2 = initEmptyNG(5, false, true, true);
     printf("%d %d %d \n", ng2->isSym, ng2->isRef, ng2->isTrans);
 
     // if((*ng2).isSym || !(*ng2).isRef || !(*ng2).isTrans)
     //     printf("DS failure \n");
     //     exit(DS_FAILED);
-    addEdge(ng2, p1);
-    debugAdjMatrix(ng2);
-    
-    //6. Creating a pair list
-    int ingoing = {1,1,2,2,3,3};
-    int outgoing = {2,3,1,3,1,2};
-    struct Pair * pl1 = initPairs(ingoing,outgoing,6);
-    debugPL(pl1, 6);
-    //7. Use initNG with above pair list
 
+    //5. adding 1->3 edge on ng2
+    addEdge(ng2, 1,3);
+    debugAdjMatrix(ng2);
+
+    //6. Creating a in->out list and using initNG
+    int ingoing[6] = {1,1,2,2,3,3};
+    printf("Ingoing: %x\n",ingoing);
+    int outgoing[6] = {2,3,1,3,1,2};
+    printf("Outgoing: %x\n",outgoing);
+    printEdges(ingoing,outgoing, 6);
+    struct NiceGraph* ng3 = initNG(3,false,false,false,ingoing,outgoing, 5);
+    debugAdjMatrix(ng3);
+    //7.
 
 
     //passed all checks, successful
+
     freeNG(ng1);
-    free(p1);
-    free(ng2);
-    freePL(pl1,6);
-    
+    freeNG(ng2);
+    freeNG(ng3);
+
     return 0;
 }
