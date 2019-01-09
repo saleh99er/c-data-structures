@@ -89,7 +89,7 @@ void addEdge(struct NiceGraph* ng, int one, int two){
 
 void removeEdge(struct NiceGraph* ng, int one, int two){
     ng->AdjacMatrix[one][two] = false;
-    printf("WIP");
+    printf("WIP \n");
 
     //symmetric logic
     if(ng->isSym)
@@ -196,49 +196,72 @@ void printEdges(int* in, int* out, int size){
 
 //comment out when using the lib
 int main(){
+    int test = 1;
 
     //1. empty Nice Graph init
+    printf("\n-------------TEST CASES %d------------\n",test);
     struct NiceGraph * ng1 = initEmptyNG(7, true, true, true);
     if(!(*ng1).isSym || !(*ng1).isRef || !(*ng1).isTrans)
         //printf("DS failure");
         exit(DS_FAILED);
-    printf("%d\n",(*ng1).AdjacMatrix[0][0]);
+    printf("Does 0->0 edge exist? %s\n",(*ng1).AdjacMatrix[0][0] ?
+     "true" : "false");
+
+    test++;
 
     //2 debug print the adjacency matrix
+    printf("\n-------------TEST CASES %d------------\n",test);
     debugAdjMatrix(ng1);
 
+    test++;
+
     //3. adding 1->3 edge on ng1
+    printf("\n-------------TEST CASES %d------------\n",test);
     addEdge(ng1, 1,3);
     debugAdjMatrix(ng1);
 
+    test++;
+
     //4. Creating a no sym, reflex, trans, graph with
     //empty Nice Graph init and same edge added
+    printf("\n-------------TEST CASES %d------------\n",test);
     struct NiceGraph* ng2 = initEmptyNG(5, false, true, true);
-    printf("%d %d %d \n", ng2->isSym, ng2->isRef, ng2->isTrans);
 
-    // if((*ng2).isSym || !(*ng2).isRef || !(*ng2).isTrans)
-    //     printf("DS failure \n");
-    //     exit(DS_FAILED);
+    if((*ng2).isSym || !(*ng2).isRef || !(*ng2).isTrans) {
+        printf("DS failure \n");
+        exit(DS_FAILED);
+    }
+
+    test++;
 
     //5. adding 1->3 edge on ng2
+    printf("\n-------------TEST CASES %d------------\n",test);
     addEdge(ng2, 1,3);
     debugAdjMatrix(ng2);
 
+    test++;
+
     //6. Creating a in->out list and using initNG
+    printf("\n-------------TEST CASES %d------------\n",test);
     int ingoing[6] = {0,0,1,1,2,2};
     printf("Ingoing: %x\n",ingoing);
     int outgoing[6] = {1,2,0,2,0,1};
     printf("Outgoing: %x\n",outgoing);
-    //printEdges(ingoing,outgoing, 6);
+    printf("Edges \n");
+    printEdges(ingoing,outgoing, 6);
     struct NiceGraph* ng3 = initNG(3,false,false,false,ingoing,outgoing, 6);
     debugAdjMatrix(ng3);
 
-    
-    //7.
+    test++;
 
+
+    //7. removing an edge on ng1
+    printf("\n-------------TEST CASES %d------------\n",test);
+    removeEdge(ng1, 1,3);
+    debugAdjMatrix(ng1);
 
     //passed all checks, successful
-
+    printf("\n-------ALL TEST CASES DONE---------\n");
     freeNG(ng1);
     freeNG(ng2);
     freeNG(ng3);
