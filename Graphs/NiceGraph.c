@@ -48,7 +48,7 @@ struct NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexiv
         printf("Reflexive,");
     if(isTransitive)
         printf("Transitive");
-    else if(!isSymmetric && !isReflexive && !isTransitive)
+    if(!isSymmetric && !isReflexive && !isTransitive)
         printf("N/a");
     printf("\n");
 
@@ -63,8 +63,10 @@ struct NiceGraph * initEmptyNG(int numOfNodes, bool isSymmetric, bool isReflexiv
 
 struct NiceGraph * initNG(int numOfNodes, bool isSymmetric, bool isReflexive, bool isTransitive, int* in, int* out, int eListSize){
     struct NiceGraph* ng = initEmptyNG(numOfNodes, isSymmetric, isReflexive, isTransitive);
-    for(int i=0;i<eListSize; i++)
+    for(int i=0; i<eListSize ; i++) {
+        printf("%d -> %d \n", in[i] , out[i]);
         addEdge(ng, in[i] , out[i] );
+    }
     return ng;
     //printf("WIP");
 }
@@ -223,13 +225,13 @@ int main(){
     debugAdjMatrix(ng2);
 
     //6. Creating a in->out list and using initNG
-    int ingoing[6] = {1,1,2,2,3,3};
+    int ingoing[6] = {0,0,1,1,2,2};
     printf("Ingoing: %x\n",ingoing);
-    int outgoing[6] = {2,3,1,3,1,2};
+    int outgoing[6] = {1,2,0,2,0,1};
     printf("Outgoing: %x\n",outgoing);
-    printEdges(ingoing,outgoing, 6);
-    struct NiceGraph* ng3 = initNG(3,false,false,false,ingoing,outgoing, 5);
-    debugAdjMatrix(ng3);
+    //printEdges(ingoing,outgoing, 6);
+    struct NiceGraph* ng3 = initNG(3,false,false,false,ingoing,outgoing, 6);
+    //debugAdjMatrix(ng3);
     //7.
 
 
