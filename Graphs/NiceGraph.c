@@ -255,10 +255,20 @@ int main(){
     test++;
 
 
-    //7. removing an edge on ng1
+    //7. removing an edge on ng1 (s,r,t)
     printf("\n-------------TEST CASES %d------------\n",test);
-    removeEdge(ng1, 1,3);
+    removeEdge(ng1, 1,3); //removing an edge that exists
+                          //removing an edge that doesn't exist
     debugAdjMatrix(ng1);
+
+    test++;
+
+    //8. removing an edge on ng2 (r,t)
+    printf("\n-------------TEST CASES %d------------\n",test);
+    removeEdge(ng2,1,3); //removing an edge that exists
+                         //removing an edge that doesn't exist
+    debugAdjMatrix(ng2);
+
 
     //passed all checks, successful
     printf("\n-------ALL TEST CASES DONE---------\n");
