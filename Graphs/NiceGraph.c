@@ -231,7 +231,9 @@ int main(){
     printf("Outgoing: %x\n",outgoing);
     //printEdges(ingoing,outgoing, 6);
     struct NiceGraph* ng3 = initNG(3,false,false,false,ingoing,outgoing, 6);
-    //debugAdjMatrix(ng3);
+    debugAdjMatrix(ng3);
+
+    
     //7.
 
 
