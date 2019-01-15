@@ -11,7 +11,6 @@ struct NiceGraph{
     bool isSym;
     bool isRef;
     bool isTrans;
-    bool isForced;
 
     int numNodes;
     bool** AdjacMatrix;
@@ -91,9 +90,14 @@ void removeEdge(struct NiceGraph* ng, int one, int two){
     ng->AdjacMatrix[one][two] = false;
     printf("WIP \n");
 
+    //if reflexive, x->x edge can't be removed
+    if(ng->isRef && one == two)
+        return;
+
     //symmetric logic
     if(ng->isSym)
         ng->AdjacMatrix[two][one] = false;
+
 
     //transitive logic
     if(ng->isTrans){
@@ -104,19 +108,19 @@ void removeEdge(struct NiceGraph* ng, int one, int two){
     }
 }
 
-struct NiceGraph* removeNode(struct NiceGraph* ng, int node){
+struct NiceGraph* removeNode(struct NiceGraph* ng, int n){
     int newNumNodes = ng->numNodes - 1;
     struct NiceGraph* newNG = initEmptyNG(newNumNodes, ng->isSym, ng->isRef, ng->isTrans);
     int k;
 
     for(int i = 0; i < newNumNodes; i++){
-        if(i < node) k=i;
-        else if(i >= node) k = i+1;
+        if(i < n) k=i;
+        else if(i >= n) k = i+1;
 
         //copy all elements in the row but one logic
         for(int j = 0; j < newNumNodes; j++){
-            if(j < node) newNG->AdjacMatrix[i][j] = ng->AdjacMatrix[k][j];
-            else if(j > node) newNG->AdjacMatrix[i][j] = ng->AdjacMatrix[k][j+1];
+            if(j < n) newNG->AdjacMatrix[i][j] = ng->AdjacMatrix[k][j];
+            else if(j > n) newNG->AdjacMatrix[i][j] = ng->AdjacMatrix[k][j+1];
         }
     }
     freeNG(ng);
@@ -268,14 +272,19 @@ int main(){
     removeEdge(ng2,1,3); //removing an edge that exists
     removeEdge(ng2,1,4); //removing an edge that doesn't exist
     debugAdjMatrix(ng2);
-    printf("Is 1->3 an edge? %s \n", isDirectConnect(ng2,1,3) ? "true":"false");
-    printf("%d \n",isDirectConnect(ng2,1,3));
-    printf("true-%d false-%d \n",true,false);
+    //printf("Is 1->3 an edge? %s \n", isDirectConnect(ng2,1,3) ? "true":"false");
+    //printf("%d \n",isDirectConnect(ng2,1,3));
+    //printf("true-%d false-%d \n",true,false);
 
+    test++;
 
+    //9. removing node 4 on ng1
+    printf("\n-------------TEST CASES %d------------\n",test);
+    struct NiceGraph* newNG1 = removeNode(ng1,4);
+    debugAdjMatrix(newNG1);
 
     //passed all checks, successful
-    printf("\n-------ALL TEST CASES DONE---------\n");
+    printf("\n-------ALL TEST CASES DONE--(%d)------\n",test);
     freeNG(ng1);
     freeNG(ng2);
     freeNG(ng3);
