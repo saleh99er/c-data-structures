@@ -5,13 +5,13 @@
 #define BAD_ARGS_DS 5
 #define DS_FAILED 6 //data struct invar failed, prob failed its check
 
-typedef int bool;
-enum{false, true};
+typedef enum { false, true } bool;
 
 struct NiceGraph{
     bool isSym;
     bool isRef;
     bool isTrans;
+    bool isForced;
 
     int numNodes;
     bool** AdjacMatrix;
@@ -99,7 +99,7 @@ void removeEdge(struct NiceGraph* ng, int one, int two){
     if(ng->isTrans){
         for(int i = 0; i < ng->numNodes; i++){
             if(ng->AdjacMatrix[two][i])
-                ng->AdjacMatrix[one][i] = true;
+                ng->AdjacMatrix[one][i] = false;
         }
     }
 }
@@ -258,7 +258,7 @@ int main(){
     //7. removing an edge on ng1 (s,r,t)
     printf("\n-------------TEST CASES %d------------\n",test);
     removeEdge(ng1, 1,3); //removing an edge that exists
-                          //removing an edge that doesn't exist
+    removeEdge(ng1, 1,4); //removing an edge that doesn't exist
     debugAdjMatrix(ng1);
 
     test++;
@@ -266,8 +266,12 @@ int main(){
     //8. removing an edge on ng2 (r,t)
     printf("\n-------------TEST CASES %d------------\n",test);
     removeEdge(ng2,1,3); //removing an edge that exists
-                         //removing an edge that doesn't exist
+    removeEdge(ng2,1,4); //removing an edge that doesn't exist
     debugAdjMatrix(ng2);
+    printf("Is 1->3 an edge? %s \n", isDirectConnect(ng2,1,3) ? "true":"false");
+    printf("%d \n",isDirectConnect(ng2,1,3));
+    printf("true-%d false-%d \n",true,false);
+
 
 
     //passed all checks, successful
