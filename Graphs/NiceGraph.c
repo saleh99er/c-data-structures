@@ -3,10 +3,12 @@
 #define DATA_SIZE_FAULT 3
 #define MALLOC_FAULT 4
 #define BAD_ARGS_DS 5
-#define DS_FAILED 6 //data struct invar failed, prob failed its check
+#define DS_FAILED 6
 
 typedef enum { false, true } bool;
 
+/*
+*/
 struct NiceGraph{
     bool isSym;
     bool isRef;
@@ -120,10 +122,9 @@ struct NiceGraph* removeNode(struct NiceGraph* ng, int n){
         //copy all elements in the row but one logic
         for(int j = 0; j < newNumNodes; j++){
             if(j < n) newNG->AdjacMatrix[i][j] = ng->AdjacMatrix[k][j];
-            else if(j > n) newNG->AdjacMatrix[i][j] = ng->AdjacMatrix[k][j+1];
+            else if(j >= n) newNG->AdjacMatrix[i][j] = ng->AdjacMatrix[k][j+1];
         }
     }
-    freeNG(ng);
     return newNG;
 }
 
@@ -278,10 +279,30 @@ int main(){
 
     test++;
 
-    //9. removing node 4 on ng1
+    //9. removing node 4 on ng1, add 1->2 on ng1, remove node 1
     printf("\n-------------TEST CASES %d------------\n",test);
     struct NiceGraph* newNG1 = removeNode(ng1,4);
+    printf("\n");
+    printf("new NG removing node 4 \n");
     debugAdjMatrix(newNG1);
+    printf("\n");
+    printf("old NG \n");
+    debugAdjMatrix(ng1);
+    printf("\n");
+
+    printf("adding edge 1->2 on ng1 \n");
+    addEdge(ng1,1,2);
+    debugAdjMatrix(ng1);
+    printf("\n");
+
+    printf("removing node 1 \n");
+    struct NiceGraph* newnewNG1 = removeNode(ng1,1);
+    debugAdjMatrix(newnewNG1);
+    printf("\n");
+
+    //10.
+
+    test++;
 
     //passed all checks, successful
     printf("\n-------ALL TEST CASES DONE--(%d)------\n",test);

@@ -5,16 +5,14 @@ Written by Saleh Hassen
 Github: saleh99er
 
 */
-
+#include <stdlib.h>;
 
 #define DATA_SIZE_FAULT 3
 #define MALLOC_FAULT 4
 #define BAD_ARGS_DS 5
 #define DS_FAILED 6
 
-typedef int bool;
-enum{false, true};
-
+typedef enum { false, true } bool;
 
 /*
 */
@@ -26,13 +24,6 @@ struct NiceGraph{
     int numNodes;
     bool** AdjacMatrix;
     void* nodes;
-};
-
-/*
-*/
-struct Pair{
-    int one;
-    int two;
 };
 
 /*
